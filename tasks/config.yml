@@ -1,0 +1,10 @@
+- name: config | add individual settings
+  ini_file:
+    dest: '{{ headphones_config_file }}'
+    section: '{{ headphones_settings_section.key }}'
+    option: '{{ headphones_setting.key }}'
+    value: '{{ headphones_setting.value }}'
+    state: present
+  loop_control:
+    loop_var: headphones_setting
+  with_dict: '{{ headphones_settings_section.value }}'

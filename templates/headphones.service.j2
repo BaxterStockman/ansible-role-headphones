@@ -1,0 +1,8 @@
+{{ ansible_managed | comment }}
+[Service]
+{% if (headphones_systemd_supplementary_groups | length) > 0 %}
+SupplementaryGroups={{ headphones_systemd_supplementary_groups | join(' ') }}
+{% endif %}
+EnvironmentFile={{ headphones_environment_file }}
+ExecStart=
+ExecStart=/usr/bin/env python2 /opt/headphones/Headphones.py -q --daemon --nolaunch --pidfile=/run/headphones/headphones.pid --config $HP_CONF --datadir $HP_DATA

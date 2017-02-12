@@ -1,0 +1,9 @@
+---
+# defaults file for ansible-role-headphones
+headphones_systemd_supplementary_groups:
+  - downloads
+
+headphones_settings: {}
+
+headphones_data_dir: /var/data/headphones
+headphones_config_file: '{{ headphones_data_dir }}/config.ini'

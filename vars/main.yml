@@ -1,0 +1,4 @@
+---
+# vars file for ansible-role-headphones
+headphones_systemd_custom_config: /etc/systemd/system/headphones.service.d/custom.conf
+headphones_environment_file: /etc/conf.d/headphones

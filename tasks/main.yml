@@ -1,0 +1,58 @@
+---
+- fail:
+    msg: 'This role is designed for systems using systemd'
+  # Default to systemd, in case fact gathering is off.
+  when: (ansible_service_mgr | default('systemd') != 'systemd'
+
+# tasks file for ansible-role-headphones
+- name: main | create supplementary groups
+  group:
+    name: '{{ headphones_systemd_supplementary_group }}'
+  loop_control:
+    loop_var: headphones_systemd_supplementary_group
+  with_items: '{{ headphones_systemd_supplementary_groups }}'
+
+- name: main | create custom systemd configuration directory
+  file:
+    path: '{{ headphones_systemd_custom_config | dirname }}'
+    state: directory
+
+- name: main | template custom systemd configuration
+  template:
+    src: headphones.service.j2
+    dest: '{{ headphones_systemd_custom_config }}'
+
+- name: main | create data dir and config file parent dir
+  file:
+    path: '{{ headphones_dir }}'
+    state: directory
+    owner: headphones
+    group: headphones
+    recurse: yes
+  loop_control:
+    loop_var: headphones_dir
+  with_items:
+    - '{{ headphones_data_dir }}'
+    - '{{ headphones_config_file | dirname }}'
+
+- name: main | create environment file directory
+  file:
+    path: '{{ headphones_environment_file | dirname }}'
+    state: directory
+
+- name: main | create headphones environment file
+  template:
+    src: headphones.conf.d.j2
+    dest: '{{ headphones_environment_file }}'
+
+- name: main | generate initial configuration file
+  command: >
+    {{ ansible_python_interpreter }} -c 'import headphones.config; headphones.config.Config("{{ headphones_config_file | quote }}").write()'
+  environment:
+    PYTHONPATH: /opt/headphones:/opt/headphones/lib
+
+- name: main | tweak headphones's configuration file
+  include: config.yml
+  loop_control:
+    loop_var: headphones_settings_section
+  with_dict: '{{ headphones_settings }}'
